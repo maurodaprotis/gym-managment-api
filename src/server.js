@@ -1,8 +1,15 @@
 require('dotenv').config();
+const Joi = require('joi');
+Joi.objectId = require('joi-objectid')(Joi);
 const express = require('express');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const { connect } = require('./utils/db');
+const errorHandler = require('./middleware/errorHandler');
+
+const membersRoutes = require('./routes/members');
+const activitiesRoutes = require('./routes/activities');
+const usersRoutes = require('./routes/users');
 
 const PORT = process.env.PORT || 2093;
 
@@ -15,6 +22,12 @@ app.use(helmet());
 if (app.get('env') === 'development') {
   app.use(morgan('tiny'));
 }
+
+app.use('/activities', activitiesRoutes);
+app.use('/members', membersRoutes);
+app.use('/users', usersRoutes);
+
+app.use(errorHandler);
 
 const start = async () => {
   try {
