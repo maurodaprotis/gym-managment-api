@@ -57,6 +57,24 @@ const memberSchema = new Schema(
         },
       },
     ],
+    debt: [
+      {
+        payment: {
+          type: ObjectId,
+          rel: 'Payment',
+          required: true,
+        },
+        amount: {
+          type: Number,
+          required: true,
+          min: 0,
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now(),
+        },
+      },
+    ],
     comments: [
       {
         comment: {
@@ -109,7 +127,7 @@ const validateMember = member => {
           .required(),
       })
     ),
-    activityId: Joi.objectId().option(),
+    activityId: Joi.objectId().required(),
   };
 
   return Joi.validate(member, schema);

@@ -15,12 +15,15 @@ const paymentSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    registerDebt: {
+      type: Boolean,
+      default: false,
+    },
     comment: {
       type: String,
       maxlength: 255,
     },
     period: {
-      required: true,
       from: {
         type: Date,
         required: true,
@@ -81,8 +84,9 @@ const validatePayment = payment => {
   const schema = {
     amount: Joi.number()
       .min(0)
-      .required(),
+      .optional(),
     isPartial: Joi.bool().optional(),
+    registerDebt: Joi.bool().optional(),
     comment: Joi.string()
       .max(255)
       .optional(),
@@ -99,4 +103,5 @@ const validatePayment = payment => {
 
 module.exports = {
   Payment,
+  validatePayment,
 };

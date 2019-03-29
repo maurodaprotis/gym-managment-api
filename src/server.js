@@ -9,6 +9,7 @@ const errorHandler = require('./middleware/errorHandler');
 
 const membersRoutes = require('./routes/members');
 const activitiesRoutes = require('./routes/activities');
+const paymentsRoutes = require('./routes/payments');
 const usersRoutes = require('./routes/users');
 
 const PORT = process.env.PORT || 2093;
@@ -25,6 +26,7 @@ if (app.get('env') === 'development') {
 
 app.use('/activities', activitiesRoutes);
 app.use('/members', membersRoutes);
+app.use('/payments', paymentsRoutes);
 app.use('/users', usersRoutes);
 
 app.use(errorHandler);

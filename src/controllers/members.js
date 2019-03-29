@@ -1,5 +1,7 @@
 const { Member } = require('../models/member');
 const { User } = require('../models/user');
+const { Activity } = require('../models/activity');
+const _ = require('lodash');
 
 exports.getMany = async (req, res) => {
   const { _id: userId } = req.user;
@@ -16,15 +18,20 @@ exports.getOne = async (req, res) => {
 };
 
 exports.createOne = async (req, res) => {
-  const { _id } = req.user;
-  const user = await User.findById(_id);
+  const { _id: userId } = req.user;
+  const user = await User.findById(userId);
   if (!user) return res.status(400).send('Invalid user');
 
-  const { name, email, dni, birthdate, phone, comments } = req.body;
+  const { name, email, dni, birthdate, phone, comments, activityId } = req.body;
 
-  let member = await Member.findOne({ user: _id, dni });
+  let member = await Member.findOne({ user: userId, dni });
+
   if (member)
     return res.status(400).send('Member with that dni already registerd');
+
+  const activity = await Activity.findOne({ _id: activityId, user: userId });
+
+  if (!activity) return res.status(400).send('Activity not found');
 
   member = new Member({
     name,
@@ -33,7 +40,13 @@ exports.createOne = async (req, res) => {
     birthdate,
     phone,
     comments,
-    user: { _id },
+    user: userId,
+    activities: [
+      {
+        name: activity.name,
+        _id: activity._id,
+      },
+    ],
   });
   await member.save();
   res.status(201).json(member);
@@ -42,9 +55,20 @@ exports.createOne = async (req, res) => {
 exports.updateOne = async (req, res) => {
   const { id } = req.params;
   const { _id: userId } = req.user;
+  const { activityId } = req.body;
+  const activity = await Activity.findOne({ _id: activityId, user: userId });
+  const data = _.omit(req.body, ['activityId']);
   const member = await Member.findOneAndUpdate(
     { _id: id, user: userId },
-    { ...req.body },
+    {
+      ...data,
+      $addToSet: {
+        activities: {
+          name: activity.name,
+          _id: activity._id,
+        },
+      },
+    },
     { new: true }
   );
 
