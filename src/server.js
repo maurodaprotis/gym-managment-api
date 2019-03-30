@@ -11,6 +11,7 @@ const membersRoutes = require('./routes/members');
 const activitiesRoutes = require('./routes/activities');
 const paymentsRoutes = require('./routes/payments');
 const usersRoutes = require('./routes/users');
+const attendancesRoutes = require('./routes/attendances');
 
 const PORT = process.env.PORT || 2093;
 
@@ -28,6 +29,7 @@ app.use('/activities', activitiesRoutes);
 app.use('/members', membersRoutes);
 app.use('/payments', paymentsRoutes);
 app.use('/users', usersRoutes);
+app.use('/attendances', attendancesRoutes);
 
 app.use(errorHandler);
 

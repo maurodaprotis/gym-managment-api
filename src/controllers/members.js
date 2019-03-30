@@ -1,7 +1,6 @@
 const { Member } = require('../models/member');
 const { User } = require('../models/user');
 const { Activity } = require('../models/activity');
-const _ = require('lodash');
 
 exports.getMany = async (req, res) => {
   const { _id: userId } = req.user;

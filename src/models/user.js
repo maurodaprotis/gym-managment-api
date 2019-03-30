@@ -26,6 +26,12 @@ const userSchema = new Schema(
       minlength: 8,
       maxlength: 1024,
     },
+    settings: {
+      daysTolerance: {
+        type: Number,
+        default: 10,
+      },
+    },
   },
   {
     timestamps: true,
