@@ -101,7 +101,9 @@ exports.createOne = async (req, res) => {
 exports.updateOne = async (req, res) => {
   const { id } = req.params;
   const { _id: userId } = req.user;
-  /* TODO update Payment */
+  /* TODO update Payment
+    Phrehabs model debt in other Schema
+  */
   const payment = await Payment.findOneAndUpdate(
     { _id: id, user: userId },
     { ...req.body },

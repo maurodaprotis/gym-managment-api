@@ -24,6 +24,7 @@ router.post(
 
 /* 
 TODO
+Phrehabs model debt in other Schema
 router.put(
   '/:id',
   [auth, validateObjectId, validate(validatePayment)],
