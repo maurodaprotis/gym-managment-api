@@ -5,7 +5,9 @@ const { Activity } = require('../models/activity');
 
 exports.getMany = async (req, res) => {
   const { _id: userId } = req.user;
-  const attendances = await Attendance.find({ user: userId });
+  const attendances = await Attendance.find({ user: userId })
+    .populate('member', 'name')
+    .populate('activity', 'name');
   res.json(attendances);
 };
 
@@ -42,19 +44,19 @@ exports.createOne = async (req, res) => {
 exports.updateOne = async (req, res) => {
   const { id } = req.params;
   const { _id: userId } = req.user;
-  const { activityId } = req.body;
-  const activity = await Activity.findOne({ _id: activityId, user: userId });
-  const data = _.omit(req.body, ['activityId']);
+  const { status, memberId, activityId } = req.body;
+
+  const member = await Member.findOne({ _id: memberId, user: userId });
+  const activity = await Member.findOne({ _id: memberId, user: userId });
+  if (!member || !activity)
+    return res.status(400).send('Invalid member or activity');
+
   const attendance = await Attendance.findOneAndUpdate(
     { _id: id, user: userId },
     {
-      ...data,
-      $addToSet: {
-        activities: {
-          name: activity.name,
-          _id: activity._id,
-        },
-      },
+      status,
+      memberId,
+      activityId,
     },
     { new: true }
   );

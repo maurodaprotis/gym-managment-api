@@ -88,10 +88,6 @@ paymentSchema.index(
 
 const Payment = mongoose.model('Payment', paymentSchema);
 
-Payment.on('index', err => {
-  console.log(err);
-});
-
 const validatePayment = payment => {
   const schema = {
     amount: Joi.when('isPartial', {

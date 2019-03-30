@@ -19,17 +19,17 @@ const attendanceSchema = new Schema(
     },
     member: {
       type: ObjectId,
-      rel: 'Member',
+      ref: 'Member',
       required: true,
     },
     activity: {
       type: ObjectId,
-      rel: 'Activity',
+      ref: 'Activity',
       required: true,
     },
     user: {
       type: ObjectId,
-      rel: 'User',
+      ref: 'User',
       required: true,
     },
   },

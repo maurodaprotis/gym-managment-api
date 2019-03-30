@@ -31,6 +31,8 @@ app.use('/payments', paymentsRoutes);
 app.use('/users', usersRoutes);
 app.use('/attendances', attendancesRoutes);
 
+app.get('/', (req, res) => res.send('🚀 API'));
+
 app.use(errorHandler);
 
 const start = async () => {
@@ -46,4 +48,5 @@ const start = async () => {
 
 module.exports = {
   start,
+  app,
 };
