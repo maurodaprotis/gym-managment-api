@@ -1,8 +1,11 @@
 const { startOfMonth, endOfMonth } = require('date-fns');
+const mongoose = require('mongoose');
 const { Payment } = require('../models/payment');
 const { User } = require('../models/user');
 const { Member } = require('../models/member');
 const { Activity } = require('../models/activity');
+
+const { ObjectId } = mongoose.Types;
 
 exports.getMany = async (req, res) => {
   const { _id: userId } = req.user;
@@ -37,23 +40,38 @@ exports.createOne = async (req, res) => {
   const member = await Member.findOne({ _id: memberId, user: userId });
   if (!member || !activity)
     return res.status(400).send('Invalid member or activity');
-  const payment = new Payment({
+
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+
+  let payment = await Payment.findOne({
+    'member.memberId': memberId,
+    'activity.activityId': activityId,
+    period: {
+      from: startOfMonth(now),
+      to: endOfMonth(now),
+    },
+  });
+
+  if (payment) return res.status(400).send('Payment already exist');
+
+  payment = new Payment({
     amount: !isPartial ? activity.price : amount,
     isPartial,
     registerDebt,
     comment,
     period: period || {
-      from: startOfMonth(Date.now()),
-      to: endOfMonth(Date.now()),
+      from: startOfMonth(now),
+      to: endOfMonth(now),
     },
     member: {
       name: member.name,
       dni: member.dni,
-      _id: member._id,
+      memberId: member._id,
     },
     activity: {
       name: activity.name,
-      _id: activity._id,
+      activityId: activity._id,
     },
     user: userId,
   });
@@ -68,7 +86,6 @@ exports.createOne = async (req, res) => {
   const memberHasActivity = member.activities.find(
     a => a._id.toString() === activity._id.toString()
   );
-  console.log(memberHasActivity);
   if (!memberHasActivity) {
     member.activities.push({
       name: activity.name,
@@ -84,6 +101,7 @@ exports.createOne = async (req, res) => {
 exports.updateOne = async (req, res) => {
   const { id } = req.params;
   const { _id: userId } = req.user;
+  /* TODO update Payment */
   const payment = await Payment.findOneAndUpdate(
     { _id: id, user: userId },
     { ...req.body },
@@ -101,6 +119,12 @@ exports.removeOne = async (req, res) => {
   const payment = await Payment.findOneAndRemove({ _id: id, user: userId });
 
   if (!payment) return res.status(404).send('Payment not found.');
+
+  if (payment.registerDebt) {
+    const member = await Member.findOne({ _id: payment.member.memberId });
+    member.removeDebt(payment._id);
+    await member.save();
+  }
 
   res.json(payment);
 };

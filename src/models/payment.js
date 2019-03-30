@@ -40,10 +40,10 @@ const paymentSchema = new Schema(
         minlength: 3,
         maxlength: 255,
       },
-      _id: {
+      activityId: {
         type: ObjectId,
-        required: true,
         ref: 'Activity',
+        required: true,
       },
     },
     member: {
@@ -59,10 +59,10 @@ const paymentSchema = new Schema(
         minlength: 3,
         maxlength: 255,
       },
-      _id: {
+      memberId: {
         type: ObjectId,
-        required: true,
         ref: 'Member',
+        required: true,
       },
     },
     user: {
@@ -76,15 +76,33 @@ const paymentSchema = new Schema(
   }
 );
 
-paymentSchema.index({ 'member._id': 1, 'period.from': 1, 'period.to': 1 });
+paymentSchema.index(
+  {
+    'member.memberId': 1,
+    'activity.activityId': 1,
+    'period.from': 1,
+    'period.to': 1,
+  },
+  { unique: true }
+);
 
 const Payment = mongoose.model('Payment', paymentSchema);
 
+Payment.on('index', err => {
+  console.log(err);
+});
+
 const validatePayment = payment => {
   const schema = {
-    amount: Joi.number()
-      .min(0)
-      .optional(),
+    amount: Joi.when('isPartial', {
+      is: true,
+      then: Joi.number()
+        .min(0)
+        .required(),
+      otherwise: Joi.number()
+        .min(0)
+        .optional(),
+    }),
     isPartial: Joi.bool().optional(),
     registerDebt: Joi.bool().optional(),
     comment: Joi.string()

@@ -97,6 +97,12 @@ const memberSchema = new Schema(
 
 memberSchema.index({ user: 1, dni: 1 }, { unique: true });
 
+memberSchema.methods.removeDebt = function(paymentId) {
+  return this.debt.remove({
+    payment: paymentId,
+  });
+};
+
 const Member = mongoose.model('Member', memberSchema);
 
 const validateMember = member => {

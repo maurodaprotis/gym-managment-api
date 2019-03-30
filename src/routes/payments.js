@@ -22,11 +22,13 @@ router.post(
   asyncMiddleware(paymentsController.createOne)
 );
 
+/* 
+TODO
 router.put(
   '/:id',
   [auth, validateObjectId, validate(validatePayment)],
   asyncMiddleware(paymentsController.updateOne)
-);
+); */
 
 router.delete(
   '/:id',
