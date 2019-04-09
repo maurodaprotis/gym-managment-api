@@ -96,7 +96,23 @@ const validateUser = user => {
   return Joi.validate(user, schema);
 };
 
+const validateCredentials = credentials => {
+  const schema = {
+    email: Joi.string()
+      .email()
+      .max(255)
+      .required(),
+    password: Joi.string()
+      .min(5)
+      .max(255)
+      .required(),
+  };
+
+  return Joi.validate(credentials, schema);
+};
+
 module.exports = {
   User,
   validateUser,
+  validateCredentials,
 };
